@@ -1,109 +1,105 @@
 #!/bin/sh
 clear
 
-size=$( identify -format "%w %h" img.png )
-arr=($size)
+WATCH_DIR="$HOME/Pictures/Screenshots"
+echo "Watching Screenshots: $WATCH_DIR"
 
-width=${arr[0]}
-height=${arr[1]}
-width_bg=$(( ${arr[0]} + 200 ))
-height_bg=$(( ${arr[1]} + 200 ))
+inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
+  # check if file is an image
+  if [ -f "$WATCH_DIR/$NEWFILE" ]; then
+    echo "File is an image! Processing... $NEWFILE"
+    NEWNAME=$NEWFILE
+    NEWFILE=$WATCH_DIR/$NEWFILE
 
-radius=25
+    # check if config file exists
+    config_file=~/.config/bs/config.sh
+    if [ ! -f "$config_file" ]; then
+      echo "config file not found!"
+      exit 1
+    fi
 
+    # check size of image
+    size=$( identify -format "%w %h" $NEWFILE )
+    arr=($size)
+    width=${arr[0]} # width of image
+    height=${arr[1]} # height of image
 
+    # width and height of background ( width + 200, height + 200 )
+    width_bg=$(( ${arr[0]} + 200 ))
+    height_bg=$(( ${arr[1]} + 200 ))
 
+    # rounded corners
+    border_width=$((width + 4))
+    border_height=$((height + 4))
 
-magick -size ${width}x${height} xc:none \
-    -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $radius,$radius" \
-    mask.png
+    # offset for corners
+    offset_x=$(( (width_bg - width)))
+    offset_y=$(( (height_bg - height)))
 
-magick img.png mask.png -alpha set -compose DstIn -composite rounded.png
-rm mask.png
+    # define radius for rounded corners
+    radius=20
 
+    # make rounded corners
+    magick -size ${width}x${height} xc:none \
+      -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $radius,$radius" \
+      border_redius_mask.png
 
-magick rounded.png \
-  \( +clone -background "rgb(0, 0, 0)" -shadow 50x10+0+4 \) \
-  +swap -background none -layers merge +repage \
-  tmp_shadow1.png
+    # make border mask
+    # magick -size ${border_width}x${border_height} xc:none \
+    #   -fill "rgb(129, 129, 129)" -draw "roundrectangle 0,0 $((border_width-1)),$((border_height-1)) $radius,$radius" \
+    #   border_mask.png
 
-# 3. Bayangan kedua: (0, 2px), blur 4px, opacity 10% (layer tambahan)
-magick tmp_shadow1.png \
-  \( +clone -background "rgb(0, 0, 0)" -shadow 50x10+0+2 \) \
-  +swap -background none -layers merge +repage \
-  rounded_shadow.png
+    # make rounded image
+    magick $NEWFILE \( border_redius_mask.png -alpha set \) -compose DstIn -composite rounded_image.png
 
-rm tmp_shadow1.png
+    # add border to rounded image
+    # magick border_mask.png \
+    #   rounded_image.png -geometry +2+2 -composite \
+    #   rounded_image_with_boder.png
 
+    # make shadow 1
+    magick rounded_image.png \
+      \( +clone -background "rgb(0, 0, 0)" -shadow 60x7+3+3 \) \
+      +swap -background none -layers merge +repage \
+      tmp_shadow1.png
 
-magick \( xc:red xc:'rgb(170, 54, 206)' +append \) \
-          \( xc:'rgb(187, 224, 122)' xc:'rgb(231, 83, 219)' +append \) -append \
-          -size ${width_bg}x${height_bg} xc: +swap  -fx 'v.p{i/(w-1),j/(h-1)}' \
-          output_bg.jpg
+    # make shadow 2
+    magick tmp_shadow1.png \
+      \( +clone -background "rgb(0, 0, 0)" -shadow 60x7-3+3 \) \
+      +swap -background none -layers merge +repage \
+      rounded_image_with_boder_shadowed.png
 
+    # make background gradient
+    magick \( xc:red xc:'rgb(170, 54, 206)' +append \) \
+      \( xc:'rgb(187, 224, 122)' xc:'rgb(231, 83, 219)' +append \) -append \
+      -size ${width_bg}x${height_bg} xc: +swap  -fx 'v.p{i/(w-1),j/(h-1)}' \
+      gradient_bg.jpg
 
-magick output_bg.jpg \
-  \( rounded_shadow.png \) -geometry +100+100 -composite \
+    # make final image
+    magick gradient_bg.jpg \
+  \( rounded_image_with_boder_shadowed.png \) -gravity center -composite \
   output.png
 
-rm rounded_shadow.png
-rm output_bg.jpg
-rm rounded.png
-#!/bin/sh
-clear
+  magick output.png \
+  -font ~/.fonts/MyCoolFont.ttf \
+  -gravity north \
+  -pointsize 15 \
+  -fill "#ffffff" -stroke "#000000" -strokewidth 2 \
+  -annotate +0+30 "Screenshot Keren!" \
+  output_with_text.png
 
-size=$( identify -format "%w %h" img.png )
-arr=($size)
+    new_dir=$WATCH_DIR/good
+    if [ ! -d "$new_dir" ]; then
+      mkdir $new_dir
+    fi
+    mv output_with_text.png $WATCH_DIR/good/$NEWNAME
 
-width=${arr[0]}
-height=${arr[1]}
+    # remove temp files
+    rm  gradient_bg.jpg tmp_shadow1.png border_redius_mask.png rounded_image.png 
 
-width_bg=$(( ${arr[0]} + 200 ))
-height_bg=$(( ${arr[1]} + 200 ))
-
-radius=25
-
-
-
-
-magick -size ${width}x${height} xc:none \
-    -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $radius,$radius" \
-    mask.png
-
-magick img.png mask.png -alpha set -compose DstIn -composite rounded.png
-rm mask.png
-
-
-magick rounded.png \
-  \( +clone -background "rgb(0, 0, 0)" -shadow 50x10+0+4 \) \
-  +swap -background none -layers merge +repage \
-  tmp_shadow1.png
-
-# 3. Bayangan kedua: (0, 2px), blur 4px, opacity 10% (layer tambahan)
-magick tmp_shadow1.png \
-  \( +clone -background "rgb(0, 0, 0)" -shadow 50x10+0+2 \) \
-  +swap -background none -layers merge +repage \
-  rounded_shadow.png
-
-rm tmp_shadow1.png
-
-
-magick \( xc:red xc:'rgb(170, 54, 206)' +append \) \
-          \( xc:'rgb(187, 224, 122)' xc:'rgb(231, 83, 219)' +append \) -append \
-          -size ${width_bg}x${height_bg} xc: +swap  -fx 'v.p{i/(w-1),j/(h-1)}' \
-          output_bg.jpg
-
-
-offset_x=$(( (width_bg - width) / 4 ))
-offset_y=$(( (height_bg - height) / 4 ))
-
-magick output_bg.jpg \
-  \( rounded_shadow.png \) -geometry +${offset_x}+${offset_y} -composite \
-  output.png
-
-echo $offset_x
-echo $offset_y
-
-rm rounded_shadow.png
-rm output_bg.jpg
-rm rounded.png
+    exit 1
+  else
+    echo "File is not an image!"
+    exit 1
+  fi
+done

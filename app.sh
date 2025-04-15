@@ -15,6 +15,23 @@ function check_fonfig() {
 check_fonfig
 source $config_file
 
+spinner() {
+  local pid=$1
+  local delay=0.1
+  local spinstr='|/-\'
+
+  echo -n "Loading $2"
+  while ps -p $pid &>/dev/null; do
+    local temp=${spinstr#?}
+    printf " [%c]  " "$spinstr"
+    local spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "🌀\n"
+}
+
+
 inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
   if [ -f "$WATCH_DIR/$NEWFILE" ]; then
     NEWNAME=$NEWFILE
@@ -30,12 +47,11 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
 
     border_width=$((width + 4))
     border_height=$((height + 4))
-    
+
     offset_x=$(( (width_bg - width)))
     offset_y=$(( (height_bg - height)))
 
     function Make_image_with_border_rounded() {
-      echo "Adding rounded corners..."
 
       magick -size ${width}x${height} xc:none \
         -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $radius,$radius" \
@@ -43,7 +59,6 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
       magick $NEWFILE \( border_redius_mask.png -alpha set \) -compose DstIn -composite rounded_image.png
     }
     function Make_shadow() {
-      echo "Adding shadows..."
 
       magick rounded_image.png \
         \( +clone -background "rgb(0, 0, 0)" -shadow 60x7+3+3 \) \
@@ -56,7 +71,6 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
     }
 
     function Make_background() {
-      echo "Making Btfl background..."
 
       magick \( xc:red xc:'rgb(170, 54, 206)' +append \) \
         \( xc:'rgb(187, 224, 122)' xc:'rgb(231, 83, 219)' +append \) -append \
@@ -65,7 +79,6 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
     }
 
     function Join_image() {
-      echo "Join image with background..."
 
       magick gradient_bg.jpg \
         \( rounded_image_with_boder_shadowed.png \) -gravity center -composite \
@@ -73,7 +86,6 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
     }
 
     function Add_text() {
-      echo "Adding text..."
 
       magick output.png \
         -font $FONT \
@@ -85,7 +97,6 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
     }
 
     function Save_image() {
-      echo "Saving image..."
 
       new_dir=$WATCH_DIR/good
       if [ ! -d "$new_dir" ]; then
@@ -93,12 +104,22 @@ inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
       fi
       mv output_with_text.png $WATCH_DIR/good/$NEWNAME
     }
-    Make_image_with_border_rounded
-    Make_shadow
-    Make_background
-    Join_image
-    Add_text
-    Save_image
+
+    function Remove_tmp() {
+      if compgen -G "./"*.{jpg,png} > /dev/null; then
+        rm ./*.{jpg,png}
+      else
+        exit 1
+      fi
+    }
+
+    Make_image_with_border_rounded & spinner $! 'Rounded corners'
+    Make_shadow & spinner $! 'Shadows'
+    Make_background & spinner $! 'Background'
+    Join_image & spinner $! 'Join'
+    Add_text & spinner $! 'Text'
+    Save_image & spinner $! 'Save'
+    Remove_tmp & spinner $! 'Remove tmp'
 
     exit 1
   else

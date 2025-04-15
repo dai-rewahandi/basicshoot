@@ -1,0 +1,145 @@
+#!/bin/sh
+clear
+
+config_file=~/.config/bs/config
+tmp_folder=~/.config/bs/.tmp
+FONT=$(fc-list | grep -i "FiraCode Nerd Font" | head -n 1 | cut -d: -f1)
+
+function check_fonfig() { 
+  if [ -f "$config_file" ]; then
+    echo "config file found!"
+  else
+  echo "config file not found!"
+  echo "creating config file..."
+    mkdir -p ~/.config/bs
+    mkdir -p $tmp_folder
+    touch $config_file
+
+    echo 'RADIUS=15
+WATCH_DIR="$HOME/Pictures/Screenshots"
+TEXT="Dai Reawahandi"
+TEXT_SIZE=20
+TEXT_COLOR="rgb(255, 255, 255)"
+TEXT_ICON="󰄀"'>> $config_file
+  fi
+}
+
+check_fonfig
+source $config_file
+
+if [ $FONT == "" ]; then
+  FONT="$HOME/.config/bs/font.ttf"
+fi
+spinner() {
+  local pid=$1
+  local delay=0.1
+  local spinstr='|/-\'
+
+  echo -n "Loading $2"
+  while ps -p $pid &>/dev/null; do
+    local temp=${spinstr#?}
+    printf " [%c]  " "$spinstr"
+    local spinstr=$temp${spinstr%"$temp"}
+    sleep $delay
+    printf "\b\b\b\b\b\b"
+  done
+  printf "🌀\n"
+}
+
+main() {
+    
+  inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
+    if [ -f "$WATCH_DIR/$NEWFILE" ]; then
+      NEWNAME=$NEWFILE
+      NEWFILE=$WATCH_DIR/$NEWFILE
+      size=$( identify -format "%w %h" $NEWFILE )
+      arr=($size)
+
+      width=${arr[0]}
+      height=${arr[1]}
+
+      width_bg=$(( ${arr[0]} + 200 ))
+      height_bg=$(( ${arr[1]} + 200 ))
+
+      border_width=$((width + 4))
+      border_height=$((height + 4))
+
+      offset_x=$(( (width_bg - width)))
+      offset_y=$(( (height_bg - height)))
+
+      function Make_image_with_border_rounded() {
+
+        magick -size ${width}x${height} xc:none \
+          -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $RADIUS,$RADIUS" \
+          $tmp_folder/border_redius_mask.png
+        magick $NEWFILE \( $tmp_folder/border_redius_mask.png -alpha set \) -compose DstIn -composite $tmp_folder/rounded_image.png
+      }
+      function Make_shadow() {
+
+        magick $tmp_folder/rounded_image.png \
+          \( +clone -background "rgb(0, 0, 0)" -shadow 60x7+3+3 \) \
+          +swap -background none -layers merge +repage \
+          $tmp_folder/tmp_shadow1.png
+        magick $tmp_folder/tmp_shadow1.png \
+          \( +clone -background "rgb(0, 0, 0)" -shadow 60x7-3+3 \) \
+          +swap -background none -layers merge +repage \
+          $tmp_folder/rounded_image_with_boder_shadowed.png
+      }
+
+      function Make_background() {
+
+        magick \( xc:red xc:'rgb(170, 54, 206)' +append \) \
+          \( xc:'rgb(187, 224, 122)' xc:'rgb(231, 83, 219)' +append \) -append \
+          -size ${width_bg}x${height_bg} xc: +swap  -fx 'v.p{i/(w-1),j/(h-1)}' \
+          $tmp_folder/gradient_bg.jpg
+      }
+
+      function Join_image() {
+
+        magick $tmp_folder/gradient_bg.jpg \
+          \( $tmp_folder/rounded_image_with_boder_shadowed.png \) -gravity center -composite \
+          $tmp_folder/output.png
+      }
+
+      function Add_text() {
+
+        magick $tmp_folder/output.png \
+          -font $FONT \
+          -gravity north \
+          -fill "$TEXT_COLOR" \
+          -pointsize "$TEXT_SIZE" \
+          -annotate +0+30 "$TEXT_ICON $TEXT" \
+          $tmp_folder/output_with_text.png
+      }
+
+      function Save_image() {
+
+        new_dir=$WATCH_DIR/good
+        if [ ! -d "$new_dir" ]; then
+          mkdir $new_dir
+        fi
+        mv $tmp_folder/output_with_text.png $WATCH_DIR/good/$NEWNAME
+      }
+
+      function Remove_tmp() {
+        rm $tmp_folder/*
+      }
+
+      Make_image_with_border_rounded & spinner $! 'Rounded corners'
+      Make_shadow & spinner $! 'Shadows'
+      Make_background & spinner $! 'Background'
+      Join_image & spinner $! 'Join'
+      Add_text & spinner $! 'Text'
+      Save_image & spinner $! 'Save'
+      Remove_tmp & spinner $! 'Remove tmp'
+
+      exit 1
+    else
+      echo "File is not an image!"
+      exit 1
+    fi
+  done
+
+}
+
+main

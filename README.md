@@ -6,8 +6,12 @@ A little polish your screenshoot.
 
 ## Installation
 ```bash
+sudo pacman -S inotify-tools
+
 git clone https://github.com/dai-rewahandi/basicshoot.git
+
 cd basicshoot
+
 sh install.sh
 ```
 

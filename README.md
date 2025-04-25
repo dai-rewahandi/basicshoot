@@ -2,13 +2,13 @@
 
 A little polish your screenshoot.
 
-![basicshoot](demo.png)
-
-![basicshoot](demo2.png)
+![basicshoot](mobile.png)
 
 ## Installation
 ```bash
-git clone https://github.com/dai-rewahandi/basicshoot.git
+open termux
+pkg install git
+git clone --branch termux https://github.com/dai-rewahandi/basicshoot.git
 cd basicshoot
 
 sh install.sh

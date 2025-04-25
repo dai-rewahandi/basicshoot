@@ -4,6 +4,8 @@ A little polish your screenshoot.
 
 ![basicshoot](demo.png)
 
+!![basicshoot](demo2.png)
+
 ## Installation
 ```bash
 sudo pacman -S inotify-tools

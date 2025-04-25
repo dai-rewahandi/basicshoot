@@ -19,7 +19,9 @@ sh install.sh
 
 ## Usage
 ```bash 
-basicshoot
+1. Run => basicshoot
+2. Take screenshot with app whatever you want
+3. check your screenshot/good folder
 ```
 
 ## Configuration

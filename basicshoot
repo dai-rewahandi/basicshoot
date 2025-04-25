@@ -49,6 +49,7 @@ spinner() {
 main() {
     
   inotifywait -e create --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
+  sleep 1
     if [ -f "$WATCH_DIR/$NEWFILE" ]; then
       NEWNAME=$NEWFILE
       NEWFILE=$WATCH_DIR/$NEWFILE
@@ -69,10 +70,15 @@ main() {
 
       function Make_image_with_border_rounded() {
 
-        magick -size ${width}x${height} xc:none \
-          -fill white -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $RADIUS,$RADIUS" \
-          $tmp_folder/border_redius_mask.png
-        magick $NEWFILE \( $tmp_folder/border_redius_mask.png -alpha set \) -compose DstIn -composite $tmp_folder/rounded_image.png
+        magick $NEWFILE \
+          \( -size ${width}x${height} xc:none -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $RADIUS,$RADIUS" \) \
+          -alpha set -compose DstIn -composite \
+          $tmp_folder/rounded.png
+          
+        magick $tmp_folder/rounded.png \
+          \( -size ${width}x${height} xc:none -stroke "rgba(53, 53, 53, 0.86)" -strokewidth 2 -fill none -draw "roundrectangle -1,-1,$((width)),$((height)),$RADIUS,$RADIUS" \) \
+          -compose over -composite \
+          $tmp_folder/rounded_image.png
       }
       function Make_shadow() {
 

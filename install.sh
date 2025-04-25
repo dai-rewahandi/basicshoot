@@ -1,5 +1,5 @@
 chmod +x basicshoot
-sudo mv basicshoot ../usr/bin
+mv basicshoot ../usr/bin
 
 termux-setup-storage
 apt update && apt upgrade

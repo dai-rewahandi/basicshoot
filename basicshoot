@@ -128,7 +128,7 @@ main() {
         if [ ! -d "$new_dir" ]; then
           mkdir $new_dir
         fi
-        mv $tmp_folder/output_with_text.png $WATCH_DIR/good/$NEWNAME
+        mv $tmp_folder/output_with_text.png $WATCH_DIR/good/"$NEWNAME"
       }
 
       function Remove_tmp() {

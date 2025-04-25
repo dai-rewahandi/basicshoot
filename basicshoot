@@ -16,7 +16,7 @@ function check_fonfig() {
     touch $config_file
 
     echo 'RADIUS=15
-WATCH_DIR="$HOME/Pictures/Screenshots"
+WATCH_DIR="$HOME/storage/pictures/Screenshots"
 TEXT="Dai Reawahandi"
 TEXT_SIZE=20
 TEXT_COLOR="rgb(255, 255, 255)"
@@ -27,9 +27,6 @@ TEXT_ICON="󰄀"'>> $config_file
 check_fonfig
 source $config_file
 
-if [ $FONT == "" ]; then
-  FONT="$HOME/.config/bs/font.ttf"
-fi
 spinner() {
   local pid=$1
   local delay=0.1

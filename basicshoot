@@ -48,7 +48,7 @@ main() {
   inotifywait -e create -e moved_to --format '%f' "$WATCH_DIR" | while read NEWFILE_RAW ; do
     sleep 4
 
-    if [[ NEWFILE_RAW == ".pending-"]] 
+    if [[ "$NEWFILE_RAW" == ".pending-"]] 
     then
       NEWFILE="${NEWFILE_RAW#.pending-*-}"
       continue

@@ -74,7 +74,7 @@ main() {
 
       function Make_image_with_border_rounded() {
 
-        magick $NEWFILE \
+        magick "$NEWFILE" \
           \( -size ${width}x${height} xc:none -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $RADIUS,$RADIUS" \) \
           -alpha set -compose DstIn -composite \
           $tmp_folder/rounded.png

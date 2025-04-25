@@ -19,7 +19,7 @@ if [ ! -f "$HOME/.config/bs/config" ]; then
     mkdir -p ~/.config/bs
     mkdir -p ~/.config/bs/.tmp
     echo 'RADIUS=15
-WATCH_DIR="$HOME/storage/dcim/Screenshots"
+WATCH_DIR="/sdcard/DCIM/Screenshots"
 TEXT="Dai Reawahandi"
 TEXT_SIZE=20
 TEXT_COLOR="rgb(255, 255, 255)"

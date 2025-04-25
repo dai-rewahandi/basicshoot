@@ -1,4 +1,27 @@
-# basicshoot
+# 📸 bs — Beautiful Screenshots with Bash + ImageMagick
+Basicshoot is a lightweight Bash-based tool that automatically watches your screenshot folder and beautifies every new image with stylish rounded corners, drop shadows, gradient background, and custom text — making your screenshots visually stunning with zero effort.
+
+## ✨ Features
+- 🔁 Auto Watcher: Monitors your screenshot folder in real-time using inotifywait.
+
+- 🖼️ Rounded Corners & Border: Adds smooth rounded corners and a clean border.
+
+- 🌫️ Shadows: Creates subtle drop shadows for depth.
+
+- 🎨 Gradient Background: Generates a colorful, two-tone gradient background.
+
+- ✍️ Custom Text & Icon: Adds your own text (e.g., name or signature) using Nerd Fonts.
+
+- 📁 Auto Save: Processed images are moved into a good/ subfolder.
+
+- ⚙️ Configurable: Everything is customizable via a simple config file at ~/.config/bs/config.
+
+## 🧰 Requirements
+1. bash
+2. ImageMagick
+3. inotify-tools
+4. Font: FiraCode Nerd Font (optional but recommended)
+---
 
 [TERMUX VERSION (ANDROID)](https://github.com/dai-rewahandi/basicshoot/tree/termux)
 

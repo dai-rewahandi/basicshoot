@@ -108,7 +108,7 @@ main() {
       function Add_text() {
 
         magick $tmp_folder/output.png \
-          -font $FONT \
+          -font "$FONT" \
           -gravity north \
           -fill "$TEXT_COLOR" \
           -pointsize "$TEXT_SIZE" \

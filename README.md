@@ -8,7 +8,12 @@ A little polish your screenshoot.
 
 ## Installation
 ```bash
+# skip if already installed
 sudo pacman -S inotify-tools
+
+# required font
+# skip if already installed
+sudo pacman -S ttf-firacode-nerd 
 
 git clone https://github.com/dai-rewahandi/basicshoot.git
 

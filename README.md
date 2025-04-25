@@ -4,7 +4,7 @@ A little polish your screenshoot.
 
 ![basicshoot](demo.png)
 
-!![basicshoot](demo2.png)
+![basicshoot](demo2.png)
 
 ## Installation
 ```bash

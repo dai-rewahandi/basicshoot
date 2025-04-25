@@ -1,5 +1,7 @@
 # basicshoot
 
+[TERMUX VERSION (ANDROID)](https://github.com/dai-rewahandi/basicshoot/tree/termux)
+
 A little polish your screenshoot.
 
 ![basicshoot](demo.png)

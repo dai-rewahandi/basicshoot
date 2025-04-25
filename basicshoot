@@ -57,7 +57,7 @@ main() {
     if [ -f "$WATCH_DIR/$NEWFILE" ]; then
       NEWNAME=$NEWFILE
       NEWFILE=$WATCH_DIR/$NEWFILE
-      size=$( identify -format "%w %h" $NEWFILE )
+      size=$( identify -format "%w %h" "$NEWFILE" )
       arr=($size)
 
       width=${arr[0]}

@@ -46,7 +46,7 @@ spinner() {
 main() {
     
   inotifywait -e create -e moved_to --format '%f' "$WATCH_DIR" | while read NEWFILE ; do
-  sleep 10
+    sleep 4
     if [ -f "$WATCH_DIR/$NEWFILE" ]; then
       NEWNAME=$NEWFILE
       NEWFILE=$WATCH_DIR/$NEWFILE

@@ -35,7 +35,7 @@ A little polish your screenshoot.
 ```bash
 # skip if already installed
 sudo pacman -S inotify-tools
-
+sudo pacman -S imagemagick
 # required font
 # skip if already installed
 sudo pacman -S ttf-firacode-nerd 

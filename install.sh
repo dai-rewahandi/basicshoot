@@ -1,5 +1,5 @@
-chmod +x basicshoot
-sudo mv basicshoot /usr/local/bin
+sudo cp basicshoot /usr/local/bin
+sudo chmod +x /usr/local/bin/basicshoot
 
 if [ ! -f "$HOME/.config/bs/config" ]; then
 

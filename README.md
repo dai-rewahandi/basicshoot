@@ -48,7 +48,7 @@ sh install.sh
 ```
 
 ## Uninstall
-<3 @ad1w
+<3 [@ad1w](https://github.com/ad1w)
 ```bash
 cd basicshoot
 bash insatall.sh -R

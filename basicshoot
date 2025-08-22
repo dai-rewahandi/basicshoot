@@ -53,7 +53,7 @@ main() {
     if [ -f "$WATCH_DIR/$NEWFILE" ]; then
       NEWNAME=$NEWFILE
       NEWFILE=$WATCH_DIR/$NEWFILE
-      size=$( identify -format "%w %h" $NEWFILE )
+      size=$( identify -format "%w %h" "$NEWFILE" )
       arr=($size)
 
       width=${arr[0]}
@@ -70,7 +70,7 @@ main() {
 
       function Make_image_with_border_rounded() {
 
-        magick $NEWFILE \
+        magick "$NEWFILE" \
           \( -size ${width}x${height} xc:none -draw "roundrectangle 0,0 $((width-1)),$((height-1)) $RADIUS,$RADIUS" \) \
           -alpha set -compose DstIn -composite \
           $tmp_folder/rounded.png
@@ -124,7 +124,7 @@ main() {
         if [ ! -d "$new_dir" ]; then
           mkdir $new_dir
         fi
-        mv $tmp_folder/output_with_text.png $WATCH_DIR/good/$NEWNAME
+        mv $tmp_folder/output_with_text.png $WATCH_DIR/good/"$NEWNAME"
       }
 
       function Remove_tmp() {

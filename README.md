@@ -62,7 +62,7 @@ vim ~/.config/bs/config
 ```bash
 RADIUS=15 # in pixel
 WATCH_DIR="$HOME/Pictures/Screenshots" # directory to watch for new screenshot
-TEXT="Dai Reawahandi" # text to add to screenshot
+TEXT="Bs" # text to add to screenshot
 TEXT_SIZE=20 # in pixel
 TEXT_COLOR="rgb(255, 255, 255)" # text color
 TEXT_ICON="󰄀"' # icon
